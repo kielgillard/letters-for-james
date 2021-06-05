@@ -17,6 +17,14 @@ final class LetterSelector: ObservableObject {
     init() {
         let lettersToChooseFrom = "abcdefghijklmnopqrstuvwxyz👻💩🤖🥸🔥".map { String($0) }
         
+        // Throttle the selection of a letter in case he's rage clicking the screen.
+        //
+        // To make this testable, the scheduler should be passed in so a unit test can control
+        // the passage of time. However, this would require me making `LetterSelector` generic
+        // over a scheduler (intrusive, leaking implementation details) or using a type erased
+        // scheduler (making one of my own or using one provided by a
+        // third party like https://github.com/pointfreeco/combine-schedulers).
+        // Thanks for thinking of testing, Apple!
         calculateNextSubject
             .throttle(for: 3.0, scheduler: DispatchQueue.main, latest: true)
             .combineLatest($letter)
